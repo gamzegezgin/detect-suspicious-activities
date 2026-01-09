@@ -29,5 +29,20 @@ The model will be trained and evaluated on the following benchmark datasets:
 * **Web Framework:** Flask
 * **Data Handling:** NumPy, Pandas
 
+## 👥 Project Team
+This graduation thesis is a collaborative effort developed by:
+
+| Team Member | Role | GitHub Profile |
+|---|---|---|
+| **Gamze Gezgin** | Researcher & Developer | [@gamzegezgin](https://github.com/gamzegezgin) |
+| **Seryal Tuncer** | Researcher & Developer | [@Seryaltuncer](https://github.com/Seryaltuncer) |
+| **Beyza K.** | Researcher & Developer | [@DevBeyzaK](https://github.com/DevBeyzaK) |
+
+---
+### 🎓 Supervisor
+**Faruk BULUT**
+* GitHub: [@bulutfaruk](https://github.com/bulutfaruk)
+* [University Name]
+* Computer Engineering Department
 
 ---
