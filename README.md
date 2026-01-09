@@ -1,4 +1,4 @@
-# Suspicious Activity Detection in Surveillance Videos using AI
+# Suspicious and Abnormal Human Activity Detection in Surveillance Systems Using AI-Based Models
 
 ![Project Status](https://img.shields.io/badge/Status-In%20Progress-yellow)
 ![Python](https://img.shields.io/badge/Python-3.8%2B-blue)
