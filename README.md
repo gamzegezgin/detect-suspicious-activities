@@ -40,9 +40,9 @@ This graduation thesis is a collaborative effort developed by:
 
 ---
 ### 🎓 Supervisor
-**Faruk BULUT**
+**Assoc. Prof. Dr. Faruk BULUT**
 * GitHub: [@bulutfaruk](https://github.com/bulutfaruk)
-* [University Name]
-* Computer Engineering Department
+* Istanbul Aydin University
+* Software Engineering Department
 
 ---
