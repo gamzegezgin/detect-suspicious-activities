@@ -1,4 +1,4 @@
-# Suspicious Activity Detection in Surveillance Videos using Deep Learning
+# Suspicious Activity Detection in Surveillance Videos using AI
 
 ![Project Status](https://img.shields.io/badge/Status-In%20Progress-yellow)
 ![Python](https://img.shields.io/badge/Python-3.8%2B-blue)
