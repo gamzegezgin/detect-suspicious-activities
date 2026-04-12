@@ -1,48 +1,44 @@
-# Suspicious and Abnormal Human Activity Detection in Surveillance Systems Using AI-Based Models
+Suspicious and Abnormal Human Activity Detection in Surveillance Systems Using AI-Based Models
+📌 Project Overview
+This repository contains the source code and research materials for our undergraduate graduation thesis. The primary goal is to develop an automated system capable of detecting suspicious and abnormal human activities (fighting, vandalism, normal activities) in surveillance footage using a hybrid Deep Learning architecture combining VGG-16 for spatial feature extraction and LSTM for temporal sequence analysis.
+🏗️ Architecture
 
-![Project Status](https://img.shields.io/badge/Status-In%20Progress-yellow)
-![Python](https://img.shields.io/badge/Python-3.8%2B-blue)
-![Framework](https://img.shields.io/badge/Framework-Keras%20%7C%20TensorFlow-orange)
+Spatial Feature Extraction: Pre-trained VGG-16 CNN
+Temporal Analysis: LSTM network for time-dependent pattern classification
+Human Localization: YOLOv8 integration
+Real-time API: Flask-based Web API with /predict endpoint
+Database: MongoDB for storing predictions
+Alerts: Twilio SMS notification module
+Dashboard: Web-based real-time monitoring interface
 
-## 📌 Project Overview
-This repository contains the source code and research materials for my undergraduate graduation thesis. The primary goal of this project is to develop an automated system capable of detecting suspicious and abnormal human activities (e.g., fighting, running, sudden movements) in surveillance footage.
+📂 Datasets
+The model is trained on a combined dataset built from the following sources:
+Baseline
 
-The proposed solution utilizes a hybrid Deep Learning architecture combining **VGG-16** for feature extraction and **LSTM** (Long Short-Term Memory) for temporal sequence analysis.
+CAVIAR Dataset — Indoor surveillance footage used as the initial baseline for model evaluation.
 
-## 🏗️ Proposed Architecture
-The system will be built upon a two-stage deep learning pipeline:
-1.  **Spatial Feature Extraction:** Using the pre-trained **VGG-16** CNN model to extract visual features from video frames.
-2.  **Temporal Analysis:** Feeding the extracted feature sequences into an **LSTM** network to learn time-dependent patterns and classify activities as "Normal" or "Abnormal".
+Extended Training Set
 
-Finally, a **Flask-based Web API** will be developed to simulate real-time detection and generate alerts.
+UCF-Crime Dataset — Large-scale real-world surveillance dataset containing anomalous and normal activities. Used across all three classes.
+Real Life Violence Situations Dataset — Contains real street fight videos collected from various sources. Added to the Fighting class (+1000 videos).
+DCSASS Dataset — Surveillance footage containing vandalism and destructive behavior. Added to the Vandalism class (+200 videos).
+KTH Action Dataset — Contains controlled recordings of human actions in outdoor environments. Added to the NormalVideos class (+600 videos).
 
-## 📂 Datasets
-The model will be trained and evaluated on the following benchmark datasets:
-* **KTH Action Dataset**
-* **CAVIAR Dataset**
-* **UCF-Crime Dataset**
+Final Class Distribution
+ClassSourcesAdditional VideosFightingUCF-Crime + Real Life Violence+1000VandalismUCF-Crime + DCSASS+200NormalVideosUCF-Crime + KTH+600
+🛠️ Tech Stack
 
-## 🛠️ Tech Stack
-* **Language:** Python
-* **Deep Learning:** TensorFlow / Keras
-* **Computer Vision:** OpenCV
-* **Web Framework:** Flask
-* **Data Handling:** NumPy, Pandas
+Language: Python
+Deep Learning: TensorFlow / Keras
+Computer Vision: OpenCV, YOLOv8
+Web Framework: Flask
+Database: MongoDB
+Notifications: Twilio SMS
+Data Handling: NumPy, Pandas
 
-## 👥 Project Team
-This graduation thesis is a collaborative effort developed by:
+👥 Project Team
+Team MemberRoleGitHubGamze GezginResearcher & Developer@gamzegezginSeryal TuncerResearcher & Developer@SeryaltuncerBeyza KonduResearcher & Developer@DevBeyzaK
+🎓 Supervisor
+Assoc. Prof. Dr. Faruk BULUT
 
-| Team Member | Role | GitHub Profile |
-|---|---|---|
-| **Gamze Gezgin** | Researcher & Developer | [@gamzegezgin](https://github.com/gamzegezgin) |
-| **Seryal Tuncer** | Researcher & Developer | [@Seryaltuncer](https://github.com/Seryaltuncer) |
-| **Beyza K.** | Researcher & Developer | [@DevBeyzaK](https://github.com/DevBeyzaK) |
-
----
-### 🎓 Supervisor
-**Assoc. Prof. Dr. Faruk BULUT**
-* GitHub: [@bulutfaruk](https://github.com/bulutfaruk)
-* Istanbul Aydin University
-* Software Engineering Department
-
----
+Istanbul Aydin University, Software Engineering Department
