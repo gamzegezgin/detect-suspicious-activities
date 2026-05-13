@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Surveillance Detection System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="app">
+
+    <header class="topbar">
+      <div class="topbar-left">
+        <div class="live-dot"></div>
+        <span class="live-text">LIVE</span>
+        <span class="cam-name">CAM-01 · Main Entrance</span>
+      </div>
+      <div class="topbar-right">
+        <span id="live-date"></span>
+        <span id="live-time"></span>
+      </div>
+    </header>
+
+    <main class="body">
+
+      <div class="feed" id="feed">
+        <video id="videoPlayer" autoplay muted loop>
+          <source src="sample.mp4" type="video/mp4">
+        </video>
+        <div class="scanline"></div>
+        <div class="corner tl"></div>
+        <div class="corner tr"></div>
+        <div class="corner bl"></div>
+        <div class="corner br"></div>
+        <div class="detection-banner hidden" id="detectionBanner">
+          <div class="banner-left">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <div>
+              <div class="banner-label" id="bannerLabel">Suspicious behavior detected</div>
+              <div class="banner-sub" id="bannerSub">Fighting · CAM-01</div>
+            </div>
+          </div>
+          <div class="conf-pill" id="confPill">87% conf.</div>
+        </div>
+      </div>
+
+      <aside class="sidebar">
+        <div class="sidebar-block">
+          <div class="block-title">STATUS</div>
+          <div class="stat-grid">
+            <div class="stat">
+              <div class="stat-val" id="alertCount">0</div>
+              <div class="stat-label">Alerts today</div>
+            </div>
+            <div class="stat">
+              <div class="stat-val green">Online</div>
+              <div class="stat-label">Camera</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sidebar-block" style="flex:1; overflow:hidden; display:flex; flex-direction:column;">
+          <div class="block-title">DETECTION LOG</div>
+          <div class="log" id="log"></div>
+        </div>
+      </aside>
+
+    </main>
+
+    <footer class="bottombar">
+      <span>Model: YOLOv8 + MobileNetV2 + BiLSTM</span>
+      <span>Seq: 30 frames · 64×64</span>
+    </footer>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
