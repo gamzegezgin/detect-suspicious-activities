@@ -303,3 +303,75 @@ body {
   font-size: 10px;
   color: var(--muted);
 }
+/* ── Drop Zone ── */
+.drop-zone {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    cursor: pointer;
+    border: 1.5px dashed var(--border2);
+    transition: border-color 0.2s;
+  }
+  
+  .drop-zone:hover, .drop-zone.dragover {
+    border-color: var(--muted2);
+  }
+  
+  .drop-zone input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+  
+  .drop-icon {
+    color: var(--muted);
+  }
+  
+  .drop-text {
+    font-size: 14px;
+    color: var(--muted2);
+  }
+  
+  .drop-sub {
+    font-size: 11px;
+    color: var(--muted);
+    font-family: var(--font-mono);
+  }
+  
+  /* ── Analyzing ── */
+  .analyzing {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(13,13,20,0.9);
+    color: var(--muted2);
+    font-size: 11px;
+    font-family: var(--font-mono);
+    padding: 6px 12px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .analyzing-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--amber);
+    border-radius: 50%;
+    animation: pulse 0.8s infinite;
+  }
+  
+  /* ── Log empty ── */
+  .log-empty {
+    font-size: 11px;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    text-align: center;
+    padding: 20px 0;
+  }

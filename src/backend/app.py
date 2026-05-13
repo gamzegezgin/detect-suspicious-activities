@@ -8,7 +8,7 @@ sys.path.append(os.path.dirname(__file__))
 from predict import predict_video
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)

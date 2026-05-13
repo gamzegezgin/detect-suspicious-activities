@@ -14,9 +14,9 @@
 
     <header class="topbar">
       <div class="topbar-left">
-        <div class="live-dot"></div>
-        <span class="live-text">LIVE</span>
-        <span class="cam-name">CAM-01 · Main Entrance</span>
+        <div class="live-dot" id="liveDot"></div>
+        <span class="live-text" id="liveText">IDLE</span>
+        <span class="cam-name">Suspicious Behavior Detection System</span>
       </div>
       <div class="topbar-right">
         <span id="live-date"></span>
@@ -27,23 +27,36 @@
     <main class="body">
 
       <div class="feed" id="feed">
-        <video id="videoPlayer" autoplay muted loop>
-          <source src="sample.mp4" type="video/mp4">
-        </video>
+        <div class="drop-zone" id="dropZone">
+          <div class="drop-icon">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          </div>
+          <div class="drop-text">Drop a video file here</div>
+          <div class="drop-sub">or click to select</div>
+          <input type="file" id="fileInput" accept="video/*">
+        </div>
+
+        <video id="videoPlayer" class="hidden" autoplay muted loop></video>
         <div class="scanline"></div>
         <div class="corner tl"></div>
         <div class="corner tr"></div>
         <div class="corner bl"></div>
         <div class="corner br"></div>
+
         <div class="detection-banner hidden" id="detectionBanner">
           <div class="banner-left">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
             <div>
-              <div class="banner-label" id="bannerLabel">Suspicious behavior detected</div>
-              <div class="banner-sub" id="bannerSub">Fighting · CAM-01</div>
+              <div class="banner-label" id="bannerLabel">Analyzing...</div>
+              <div class="banner-sub" id="bannerSub"></div>
             </div>
           </div>
-          <div class="conf-pill" id="confPill">87% conf.</div>
+          <div class="conf-pill" id="confPill"></div>
+        </div>
+
+        <div class="analyzing hidden" id="analyzing">
+          <div class="analyzing-dot"></div>
+          Analyzing video...
         </div>
       </div>
 
@@ -52,19 +65,21 @@
           <div class="block-title">STATUS</div>
           <div class="stat-grid">
             <div class="stat">
-              <div class="stat-val" id="alertCount">0</div>
-              <div class="stat-label">Alerts today</div>
+              <div class="stat-val red" id="alertCount">0</div>
+              <div class="stat-label">Alerts</div>
             </div>
             <div class="stat">
-              <div class="stat-val green">Online</div>
-              <div class="stat-label">Camera</div>
+              <div class="stat-val green" id="systemStatus">Ready</div>
+              <div class="stat-label">System</div>
             </div>
           </div>
         </div>
 
         <div class="sidebar-block" style="flex:1; overflow:hidden; display:flex; flex-direction:column;">
           <div class="block-title">DETECTION LOG</div>
-          <div class="log" id="log"></div>
+          <div class="log" id="log">
+            <div class="log-empty">No detections yet</div>
+          </div>
         </div>
       </aside>
 

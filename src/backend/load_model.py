@@ -1,3 +1,5 @@
+import ssl
+ssl._create_default_https_context = ssl._create_unverified_context
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import (
     TimeDistributed, Bidirectional, LSTM,

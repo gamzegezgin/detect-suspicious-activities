@@ -1,111 +1,166 @@
-// ── Saat & Tarih ─────────────────────────────────────────────
 function pad(n) { return String(n).padStart(2, '0'); }
 
 function updateClock() {
   const now = new Date();
-  const date = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`;
-  const time = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
-  document.getElementById('live-date').textContent = date;
-  document.getElementById('live-time').textContent = time;
+  document.getElementById('live-date').textContent =
+    `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`;
+  document.getElementById('live-time').textContent =
+    `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
 }
 updateClock();
 setInterval(updateClock, 1000);
 
-// ── Alert sayacı ─────────────────────────────────────────────
-let alertCount = 0;
+const dropZone     = document.getElementById('dropZone');
+const fileInput    = document.getElementById('fileInput');
+const videoPlayer  = document.getElementById('videoPlayer');
+const banner       = document.getElementById('detectionBanner');
+const bannerLabel  = document.getElementById('bannerLabel');
+const bannerSub    = document.getElementById('bannerSub');
+const confPill     = document.getElementById('confPill');
+const analyzing    = document.getElementById('analyzing');
+const alertCount   = document.getElementById('alertCount');
+const systemStatus = document.getElementById('systemStatus');
+const liveDot      = document.getElementById('liveDot');
+const liveText     = document.getElementById('liveText');
+const log          = document.getElementById('log');
 
-// ── Detection banner göster ──────────────────────────────────
-function showDetection(label, confidence) {
-  const banner  = document.getElementById('detectionBanner');
-  const lbl     = document.getElementById('bannerLabel');
-  const sub     = document.getElementById('bannerSub');
-  const pill    = document.getElementById('confPill');
+let alerts = 0;
 
+dropZone.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  dropZone.classList.add('dragover');
+});
+
+dropZone.addEventListener('dragleave', (e) => {
+  e.stopPropagation();
+  dropZone.classList.remove('dragover');
+});
+
+dropZone.addEventListener('drop', (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  dropZone.classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('video/')) {
+    handleVideo(file);
+  }
+});
+
+fileInput.addEventListener('change', (e) => {
+  e.stopPropagation();
+  const file = fileInput.files[0];
+  if (file) handleVideo(file);
+});
+
+function handleVideo(file) {
+  console.log('handleVideo çalıştı:', file.name, file.size);
+
+  const url = URL.createObjectURL(file);
+  videoPlayer.src = url;
+  videoPlayer.classList.remove('hidden');
+  dropZone.classList.add('hidden');
+
+  liveDot.style.background = '#BA7517';
+  liveText.textContent = 'ANALYZING';
+  liveText.style.color = '#BA7517';
+  systemStatus.textContent = 'Busy';
+  systemStatus.className = 'stat-val';
+  analyzing.classList.remove('hidden');
+  banner.classList.add('hidden');
+
+  const formData = new FormData();
+  formData.append('video', file);
+
+  fetch('http://localhost:5000/predict', {
+    method: 'POST',
+    body: formData
+  })
+  .then(res => res.json())
+  .then(data => {
+    console.log('Backend cevabı:', data);
+    analyzing.classList.add('hidden');
+    if (data.error) {
+      showResult('Error', data.error, 0);
+    } else {
+      showResult(data.label, data.label, data.confidence);
+    }
+  })
+  .catch((err) => {
+    console.log('Hata:', err);
+    analyzing.classList.add('hidden');
+    showResult('Error', 'Server connection failed', 0);
+  });
+}
+
+function showResult(label, sublabel, confidence) {
   banner.className = 'detection-banner';
 
   if (label === 'Fighting') {
-    lbl.textContent = 'Suspicious behavior detected';
-    sub.textContent = 'Fighting · CAM-01';
+    bannerLabel.textContent = 'Suspicious behavior detected';
+    bannerSub.textContent   = 'Fighting detected';
+    liveDot.style.background = '#E24B4A';
+    liveText.textContent = 'ALERT';
+    liveText.style.color = '#E24B4A';
   } else if (label === 'Vandalism') {
-    lbl.textContent = 'Suspicious behavior detected';
-    sub.textContent = 'Vandalism · CAM-01';
+    bannerLabel.textContent = 'Suspicious behavior detected';
+    bannerSub.textContent   = 'Vandalism detected';
     banner.classList.add('vandalism');
-  } else {
-    lbl.textContent = 'Normal activity';
-    sub.textContent = 'No threat detected · CAM-01';
+    liveDot.style.background = '#BA7517';
+    liveText.textContent = 'ALERT';
+    liveText.style.color = '#BA7517';
+  } else if (label === 'NormalVideos') {
+    bannerLabel.textContent = 'Normal activity';
+    bannerSub.textContent   = 'No threat detected';
     banner.classList.add('normal');
+    liveDot.style.background = '#1D9E75';
+    liveText.textContent = 'LIVE';
+    liveText.style.color = '#1D9E75';
+  } else {
+    bannerLabel.textContent = sublabel;
+    bannerSub.textContent   = '';
   }
 
-  pill.textContent = `${confidence.toFixed(0)}% conf.`;
+  confPill.textContent = confidence > 0 ? `${confidence.toFixed(0)}% conf.` : '';
   banner.classList.remove('hidden');
+  systemStatus.textContent = 'Ready';
+  systemStatus.className   = 'stat-val green';
 
-  if (label !== 'NormalVideos') {
-    alertCount++;
-    document.getElementById('alertCount').textContent = alertCount;
-    document.getElementById('alertCount').className = 'stat-val red';
+  if (label === 'Fighting' || label === 'Vandalism') {
+    alerts++;
+    alertCount.textContent = alerts;
   }
 
   addLog(label, confidence);
 }
 
-// ── Log'a ekle ───────────────────────────────────────────────
 function addLog(label, confidence) {
-  const log  = document.getElementById('log');
+  const empty = log.querySelector('.log-empty');
+  if (empty) empty.remove();
+
   const now  = new Date();
   const time = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
 
-  const icons = {
-    'Fighting':     '⚠',
-    'Vandalism':    '⚠',
-    'NormalVideos': '✓'
-  };
-
-  const colors = {
-    'Fighting':     '#E24B4A',
-    'Vandalism':    '#BA7517',
-    'NormalVideos': '#1D9E75'
-  };
-
-  const classes = {
-    'Fighting':     '',
-    'Vandalism':    'vandalism',
-    'NormalVideos': 'normal'
-  };
+  const colors  = { 'Fighting': '#E24B4A', 'Vandalism': '#BA7517', 'NormalVideos': '#1D9E75' };
+  const classes = { 'Fighting': '', 'Vandalism': 'vandalism', 'NormalVideos': 'normal' };
+  const icons   = { 'Fighting': '⚠', 'Vandalism': '⚠', 'NormalVideos': '✓' };
+  const names   = { 'Fighting': 'Fighting', 'Vandalism': 'Vandalism', 'NormalVideos': 'Normal' };
 
   const item = document.createElement('div');
-  item.className = `log-item ${classes[label]}`;
+  item.className = `log-item ${classes[label] || ''}`;
   item.innerHTML = `
     <div class="log-type ${label === 'NormalVideos' ? 'normal' : ''}">
-      ${icons[label]} ${label === 'NormalVideos' ? 'Normal' : label}
+      ${icons[label] || '?'} ${names[label] || label}
     </div>
     <div class="log-meta">
-      <span>CAM-01</span>
+      <span>uploaded video</span>
       <span>${time}</span>
     </div>
     <div class="conf-bar">
-      <div class="conf-fill" style="width:${confidence.toFixed(0)}%;background:${colors[label]};"></div>
+      <div class="conf-fill" style="width:${confidence.toFixed(0)}%;background:${colors[label] || '#888'};"></div>
     </div>
   `;
 
   log.insertBefore(item, log.firstChild);
-
-  // Maksimum 20 log tut
-  while (log.children.length > 20) {
-    log.removeChild(log.lastChild);
-  }
+  while (log.children.length > 20) log.removeChild(log.lastChild);
 }
-
-// ── Backend'e her 5 saniyede tahmin iste ────────────────────
-async function fetchPrediction() {
-  try {
-    const res  = await fetch('http://localhost:5000/status');
-    const data = await res.json();
-    if (data.label) {
-      showDetection(data.label, data.confidence);
-    }
-  } catch (e) {
-    console.log('Server bağlantısı yok');
-  }
-}
-
-setInterval(fetchPrediction, 5000);
