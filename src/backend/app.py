@@ -1,8 +1,9 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 import os
 import sys
-import random
+import threading
+import time
 
 sys.path.append(os.path.dirname(__file__))
 from predict import predict_video
@@ -10,15 +11,36 @@ from predict import predict_video
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
-UPLOAD_FOLDER = "uploads"
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+# Video klasörü — frontend/videos/ klasörü
+VIDEOS_DIR = os.path.join(os.path.dirname(__file__), '..', 'frontend', 'videos')
+videos = sorted([f for f in os.listdir(VIDEOS_DIR) if f.endswith('.mp4')])
 
-# Sahte durum — model hazır olunca gerçekle değiştirilecek
+current_index = 0
 current_status = {
     "label": "NormalVideos",
     "confidence": 91.0,
-    "suspicious": False
+    "suspicious": False,
+    "video": videos[0] if videos else ""
 }
+
+def analyze_next():
+    global current_index, current_status
+    while True:
+        video_name = videos[current_index]
+        video_path = os.path.join(VIDEOS_DIR, video_name)
+
+        result = predict_video(video_path)
+        result["video"] = video_name
+
+        current_status = result
+        print(f"[{current_index+1}/{len(videos)}] {video_name} → {result['label']} ({result['confidence']}%)")
+
+        current_index = (current_index + 1) % len(videos)
+        time.sleep(2)
+
+# Arka planda analiz başlat
+thread = threading.Thread(target=analyze_next, daemon=True)
+thread.start()
 
 @app.route("/")
 def index():
@@ -28,25 +50,9 @@ def index():
 def status():
     return jsonify(current_status)
 
-@app.route("/predict", methods=["POST"])
-def predict():
-    if "video" not in request.files:
-        return jsonify({"error": "No video file"}), 400
-
-    file = request.files["video"]
-    if file.filename == "":
-        return jsonify({"error": "No file selected"}), 400
-
-    video_path = os.path.join(UPLOAD_FOLDER, file.filename)
-    file.save(video_path)
-
-    result = predict_video(video_path)
-    os.remove(video_path)
-
-    global current_status
-    current_status = result
-
-    return jsonify(result)
+@app.route("/video/<filename>")
+def serve_video(filename):
+    return send_file(os.path.join(VIDEOS_DIR, filename))
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+    app.run(debug=False, port=5000)

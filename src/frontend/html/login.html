@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Surveillance System — Login</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="login.css">
+</head>
+<body>
+  <div class="login-wrap">
+    <div class="login-box">
+      <div class="login-header">
+        <div class="shield-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
+        <h1>Surveillance AI</h1>
+        <p>Authorized personnel only</p>
+      </div>
+
+      <div class="login-form">
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" id="username" placeholder="Enter username" autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="password" placeholder="Enter password">
+        </div>
+        <div class="error-msg hidden" id="errorMsg">Invalid credentials</div>
+        <button class="login-btn" id="loginBtn">Sign In</button>
+      </div>
+
+      <div class="login-footer">
+        <span>System v1.0</span>
+        <span id="login-time"></span>
+      </div>
+    </div>
+  </div>
+  <script src="login.js"></script>
+</body>
+</html>
