@@ -8,30 +8,53 @@ function updateTime() {
 updateTime();
 setInterval(updateTime, 1000);
 
-const loginBtn = document.getElementById('loginBtn');
-const errorMsg = document.getElementById('errorMsg');
-
 // Zaten giriş yapılmışsa direkt dashboard'a git
-if (localStorage.getItem('auth') === 'true') {
+if (localStorage.getItem('token')) {
   window.location.href = 'index.html';
 }
 
-loginBtn.addEventListener('click', () => {
+const loginBtn = document.getElementById('loginBtn');
+const errorMsg = document.getElementById('errorMsg');
+
+loginBtn.addEventListener('click', async () => {
   const username = document.getElementById('username').value.trim();
   const password = document.getElementById('password').value.trim();
 
-  // Admin credentials
-  if (username === 'admin' && password === 'admin123') {
-    localStorage.setItem('auth', 'true');
-    localStorage.setItem('user', username);
-    window.location.href = 'index.html';
-  } else {
+  if (!username || !password) {
     errorMsg.classList.remove('hidden');
-    setTimeout(() => errorMsg.classList.add('hidden'), 3000);
+    return;
+  }
+
+  loginBtn.textContent = 'AUTHENTICATING...';
+  loginBtn.disabled = true;
+
+  try {
+    const res = await fetch('http://localhost:5000/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+
+    const data = await res.json();
+
+    if (res.ok && data.token) {
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', data.username);
+      window.location.href = 'index.html';
+    } else {
+      errorMsg.classList.remove('hidden');
+      setTimeout(() => errorMsg.classList.add('hidden'), 3000);
+      loginBtn.textContent = 'SIGN IN';
+      loginBtn.disabled = false;
+    }
+  } catch (err) {
+    errorMsg.textContent = 'Server connection failed';
+    errorMsg.classList.remove('hidden');
+    loginBtn.textContent = 'SIGN IN';
+    loginBtn.disabled = false;
   }
 });
 
-// Enter tuşu ile giriş
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Enter') loginBtn.click();
 });

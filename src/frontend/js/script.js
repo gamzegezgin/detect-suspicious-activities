@@ -1,7 +1,8 @@
-// Auth kontrolü
-if (localStorage.getItem('auth') !== 'true') {
+const token = localStorage.getItem('token');
+if (!token) {
   window.location.href = 'login.html';
 }
+
 function pad(n) { return String(n).padStart(2, '0'); }
 
 function updateClock() {
@@ -22,22 +23,33 @@ const confPill     = document.getElementById('confPill');
 const alertCount   = document.getElementById('alertCount');
 const log          = document.getElementById('log');
 
-let alerts     = 0;
-let lastVideo  = '';
+let alerts    = 0;
+let lastVideo = '';
 
 function fetchStatus() {
-  fetch('http://localhost:5000/status')
-    .then(r => r.json())
-    .then(data => {
-      // Yeni video geldiyse oynat
-      if (data.video && data.video !== lastVideo) {
-        lastVideo = data.video;
-        videoPlayer.src = `http://localhost:5000/video/${data.video}`;
-        videoPlayer.play();
-      }
-      showResult(data.label, data.confidence);
-    })
-    .catch(err => console.log('Bağlantı hatası:', err));
+  fetch('http://localhost:5000/status', {
+    headers: { 'Authorization': `Bearer ${token}` }
+  })
+  .then(r => {
+    if (r.status === 401) {
+      localStorage.removeItem('token');
+      window.location.href = 'login.html';
+      return null;
+    }
+    return r.json();
+  })
+  .then(data => {
+    if (!data) return;
+    if (data.video && data.video !== lastVideo) {
+      lastVideo = data.video;
+      videoPlayer.src = '';
+      videoPlayer.load();
+      videoPlayer.src = `http://localhost:5000/video/${data.video}`;
+      videoPlayer.play().catch(e => console.log('Video play error:', e));
+    }
+    showResult(data.label, data.confidence);
+  })
+  .catch(err => console.log('Bağlantı hatası:', err));
 }
 
 function showResult(label, confidence) {
@@ -98,6 +110,5 @@ function addLog(label, confidence) {
   while (log.children.length > 20) log.removeChild(log.lastChild);
 }
 
-// Her 3 saniyede bir status kontrol et
 fetchStatus();
 setInterval(fetchStatus, 3000);
