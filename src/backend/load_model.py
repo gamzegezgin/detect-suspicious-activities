@@ -1,5 +1,6 @@
 import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
+
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import (
     TimeDistributed, Bidirectional, LSTM,
@@ -23,15 +24,17 @@ def build_and_load():
     model = Sequential([
         TimeDistributed(mobilenet, input_shape=(SEQ_LEN, IMG_HEIGHT, IMG_WIDTH, 3)),
         TimeDistributed(GlobalAveragePooling2D()),
+        Bidirectional(LSTM(128, return_sequences=True)),
+        Dropout(0.5),
         Bidirectional(LSTM(64, return_sequences=False)),
         Dropout(0.5),
-        Dense(64, activation='relu'),
-        Dropout(0.3),
+        Dense(128, activation='relu'),
+        Dropout(0.4),
         Dense(NUM_CLASSES, activation='softmax')
     ])
 
     BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    WEIGHTS  = os.path.join(BASE_DIR, "model", "model_weights.weights.h5")
+    WEIGHTS  = os.path.join(BASE_DIR, "model", "model_v2_weights.weights.h5")
     model.load_weights(WEIGHTS)
-    print("Model yüklendi!")
+    print("Model yuklendi!")
     return model
