@@ -20,8 +20,8 @@ app.config['JWT_ACCESS_TOKEN_EXPIRES'] = False
 jwt = JWTManager(app)
 
 # ── Telegram ─────────────────────────────────────────────────
-TELEGRAM_TOKEN   = "8910446850:AAFRI5T5srghwQ2ZKstEyHLWfyPAf_ZEuRw"
-TELEGRAM_CHAT_ID = "7574376004"
+TELEGRAM_TOKEN    = "8910446850:AAFRI5T5srghwQ2ZKstEyHLWfyPAf_ZEuRw"
+TELEGRAM_CHAT_IDS = ["7574376004"]  # Buraya diğer chat ID'leri ekle
 
 def send_telegram(label, confidence, video_name):
     emoji = "🥊" if label == "Fighting" else "💥"
@@ -31,14 +31,15 @@ def send_telegram(label, confidence, video_name):
         f"🏷 Tür: *{label}*\n"
         f"📊 Güven: %{confidence}"
     )
-    try:
-        requests.post(
-            f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
-            json={"chat_id": TELEGRAM_CHAT_ID, "text": msg, "parse_mode": "Markdown"},
-            timeout=5
-        )
-    except Exception as e:
-        print(f"Telegram hatası: {e}")
+    for chat_id in TELEGRAM_CHAT_IDS:
+        try:
+            requests.post(
+                f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
+                json={"chat_id": chat_id, "text": msg, "parse_mode": "Markdown"},
+                timeout=5
+            )
+        except Exception as e:
+            print(f"Telegram hatası ({chat_id}): {e}")
 
 # ── Database ─────────────────────────────────────────────────
 DB_PATH = os.path.join(os.path.dirname(__file__), 'users.db')
@@ -90,7 +91,6 @@ def analyze_next():
         confidence = result.get('confidence', 0)
         print(f"[{current_index+1}/{len(videos)}] {video_name} → {label} (%{confidence})")
 
-        # Sadece şüpheli aktivitelerde Telegram bildirimi gönder
         if label in ["Fighting", "Vandalism"]:
             send_telegram(label, confidence, video_name)
 
@@ -127,7 +127,6 @@ def index():
 @app.route("/status")
 @jwt_required()
 def status():
-    # Normal aktiviteleri panele gönderme, sadece şüphelileri gönder
     if current_status.get("suspicious", False):
         return jsonify(current_status)
     else:
