@@ -21,6 +21,7 @@ def build_and_load():
         input_shape=(IMG_HEIGHT, IMG_WIDTH, 3)
     )
     mobilenet.trainable = False
+
     model = Sequential([
         TimeDistributed(mobilenet, input_shape=(SEQ_LEN, IMG_HEIGHT, IMG_WIDTH, 3)),
         TimeDistributed(GlobalAveragePooling2D()),

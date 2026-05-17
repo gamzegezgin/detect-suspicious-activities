@@ -7,6 +7,7 @@ import threading
 import time
 import sqlite3
 import hashlib
+import requests
 
 sys.path.append(os.path.dirname(__file__))
 from predict import predict_video
@@ -17,6 +18,27 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 app.config['JWT_SECRET_KEY'] = 'surveillance-secret-key-2026'
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = False
 jwt = JWTManager(app)
+
+# ── Telegram ─────────────────────────────────────────────────
+TELEGRAM_TOKEN   = "8910446850:AAFRI5T5srghwQ2ZKstEyHLWfyPAf_ZEuRw"
+TELEGRAM_CHAT_ID = "7574376004"
+
+def send_telegram(label, confidence, video_name):
+    emoji = "🥊" if label == "Fighting" else "💥"
+    msg = (
+        f"{emoji} *ŞÜPHELİ AKTİVİTE TESPİT EDİLDİ*\n\n"
+        f"📁 Video: `{video_name}`\n"
+        f"🏷 Tür: *{label}*\n"
+        f"📊 Güven: %{confidence}"
+    )
+    try:
+        requests.post(
+            f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
+            json={"chat_id": TELEGRAM_CHAT_ID, "text": msg, "parse_mode": "Markdown"},
+            timeout=5
+        )
+    except Exception as e:
+        print(f"Telegram hatası: {e}")
 
 # ── Database ─────────────────────────────────────────────────
 DB_PATH = os.path.join(os.path.dirname(__file__), 'users.db')
@@ -63,7 +85,15 @@ def analyze_next():
         result = predict_video(video_path)
         result["video"] = video_name
         current_status = result
-        print(f"[{current_index+1}/{len(videos)}] {video_name} → {result['label']} ({result['confidence']}%)")
+
+        label = result.get('label', '')
+        confidence = result.get('confidence', 0)
+        print(f"[{current_index+1}/{len(videos)}] {video_name} → {label} (%{confidence})")
+
+        # Sadece şüpheli aktivitelerde Telegram bildirimi gönder
+        if label in ["Fighting", "Vandalism"]:
+            send_telegram(label, confidence, video_name)
+
         current_index = (current_index + 1) % len(videos)
         time.sleep(2)
 
@@ -97,7 +127,16 @@ def index():
 @app.route("/status")
 @jwt_required()
 def status():
-    return jsonify(current_status)
+    # Normal aktiviteleri panele gönderme, sadece şüphelileri gönder
+    if current_status.get("suspicious", False):
+        return jsonify(current_status)
+    else:
+        return jsonify({
+            "label": "NormalVideos",
+            "confidence": current_status.get("confidence", 0),
+            "suspicious": False,
+            "video": current_status.get("video", "")
+        })
 
 @app.route("/video/<filename>")
 def serve_video(filename):
