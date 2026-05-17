@@ -21,7 +21,7 @@ jwt = JWTManager(app)
 
 # ── Telegram ─────────────────────────────────────────────────
 TELEGRAM_TOKEN    = "8910446850:AAFRI5T5srghwQ2ZKstEyHLWfyPAf_ZEuRw"
-TELEGRAM_CHAT_IDS = ["7574376004"]  # Buraya diğer chat ID'leri ekle
+TELEGRAM_CHAT_IDS = ["7574376004", "8327708889"] # Buraya diğer chat ID'leri ekle
 
 def send_telegram(label, confidence, video_name):
     emoji = "🥊" if label == "Fighting" else "💥"
