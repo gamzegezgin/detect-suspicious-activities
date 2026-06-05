@@ -44,10 +44,12 @@ function fetchStatus() {
       if (!data) return;
       if (data.video && data.video !== lastVideo) {
         lastVideo = data.video;
-        videoPlayer.src = "";
-        videoPlayer.load();
-        videoPlayer.src = `http://localhost:5000/video/${data.video}`;
-        videoPlayer.play().catch((e) => console.log("Video play error:", e));
+        videoPlayer.style.opacity = '0';
+        setTimeout(() => {
+          videoPlayer.src = `http://localhost:5000/video/${data.video}`;
+          videoPlayer.play().catch(e => console.log('Video play error:', e));
+          videoPlayer.style.opacity = '0.85';
+        }, 300);
       }
       showResult(data.label, data.confidence);
     })
