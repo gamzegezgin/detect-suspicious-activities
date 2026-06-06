@@ -3,14 +3,12 @@ if (!token) {
   window.location.href = "login.html";
 }
 
-function pad(n) {
-  return String(n).padStart(2, "0");
-}
+function pad(n) { return String(n).padStart(2, "0"); }
 
 function updateClock() {
   const now = new Date();
   document.getElementById("live-date").textContent =
-    `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+    `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`;
   document.getElementById("live-time").textContent =
     `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
 }
@@ -32,7 +30,7 @@ function fetchStatus() {
   fetch("http://localhost:5000/status", {
     headers: { Authorization: `Bearer ${token}` },
   })
-    .then((r) => {
+    .then(r => {
       if (r.status === 401) {
         localStorage.removeItem("token");
         window.location.href = "login.html";
@@ -40,20 +38,17 @@ function fetchStatus() {
       }
       return r.json();
     })
-    .then((data) => {
+    .then(data => {
       if (!data) return;
       if (data.video && data.video !== lastVideo) {
         lastVideo = data.video;
-        videoPlayer.style.opacity = '0';
-        setTimeout(() => {
-          videoPlayer.src = `http://localhost:5000/video/${data.video}`;
-          videoPlayer.play().catch(e => console.log('Video play error:', e));
-          videoPlayer.style.opacity = '0.85';
-        }, 300);
+        const newSrc = `http://localhost:5000/video/${data.video}`;
+        videoPlayer.src = newSrc;
+        videoPlayer.play().catch(e => console.log(e));
+        showResult(data.label, data.confidence);
       }
-      showResult(data.label, data.confidence);
     })
-    .catch((err) => console.log("Bağlantı hatası:", err));
+    .catch(err => console.log("Bağlantı hatası:", err));
 }
 
 function showResult(label, confidence) {
@@ -67,8 +62,8 @@ function showResult(label, confidence) {
     bannerSub.textContent = "Vandalism detected";
     banner.classList.add("vandalism");
   } else {
-    banner.classList.add("hidden"); // Normal ise banner'ı gizle
-    return; // Buradan çık, log ekleme
+    banner.classList.add("hidden");
+    return;
   }
 
   confPill.textContent = `${confidence.toFixed(0)}% conf.`;
@@ -89,22 +84,10 @@ function addLog(label, confidence) {
   const now = new Date();
   const time = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
 
-  const colors = {
-    Fighting: "#E24B4A",
-    Vandalism: "#BA7517",
-    NormalVideos: "#1D9E75",
-  };
-  const classes = {
-    Fighting: "",
-    Vandalism: "vandalism",
-    NormalVideos: "normal",
-  };
+  const colors = { Fighting: "#E24B4A", Vandalism: "#BA7517", NormalVideos: "#1D9E75" };
+  const classes = { Fighting: "", Vandalism: "vandalism", NormalVideos: "normal" };
   const icons = { Fighting: "⚠", Vandalism: "⚠", NormalVideos: "✓" };
-  const names = {
-    Fighting: "Fighting",
-    Vandalism: "Vandalism",
-    NormalVideos: "Normal",
-  };
+  const names = { Fighting: "Fighting", Vandalism: "Vandalism", NormalVideos: "Normal" };
 
   const item = document.createElement("div");
   item.className = `log-item ${classes[label] || ""}`;
